@@ -2,6 +2,13 @@
 
 A 5U, 3D-printable cradle for a 10-inch rack. It holds one Mac Studio standing on its side and two Mac minis standing on edge beside it. The minis sit between movable separators, so the same frame works with M1 minis now and M4 minis later.
 
+There are two ways to build it:
+
+- **One piece.** The whole frame is a single print on a 256 × 256 × 256 mm printer (Bambu X1/P1/A1 class). It needs no screws and no supports.
+- **Bolt-together.** Five smaller parts fit a 235 mm bed and are joined with 10 M3 screws.
+
+Both builds use the same separators.
+
 ![Mac Studio and two M1 minis in the cradle](images/assembly_m1.png)
 
 | 2× M1 (now) | 2× M4 (later) | M1 + M4 |
@@ -39,47 +46,73 @@ Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. T
 
 The spare bay in the M1 layout (~31 mm) is wide enough for something thin, such as a USB hub or a slim SSD enclosure.
 
-## Parts
+## Build A: one piece (256 mm printer)
 
-All STLs in [`stl/`](stl) are already in print orientation and need no supports.
+![One-piece frame in print orientation](images/onepiece_print.png)
 
-| Part | Qty | Size (mm) | Notes |
+| File | Qty | Size (mm) |
+|---|---|---|
+| [`stl/frame_onepiece.stl`](stl/frame_onepiece.stl) | 1 | 254 × 221.5 × 206.5 |
+| [`stl/separator.stl`](stl/separator.stl) | 3 | 198 × 95 × 3 |
+
+The frame STL is already in print orientation: **face-down**, with the rack ears and the front edges on the bed. Printed this way:
+
+- The top bar sits on the plate instead of bridging 210 mm in mid-air.
+- The side-frame cutouts are 45° diamonds, and the rear stop is a 45° ramp.
+- The widest bridge is 3.4 mm, at the separator slot ceilings.
+
+It needs no supports.
+
+The frame is 254 mm wide, which leaves about 1 mm on each side of a 256 mm plate. Center it, and don't add an outer brim. The part touches the bed only along a thin rectangular outline, so make sure the plate is clean. If you want more grip, use an inner-only brim or a little glue stick.
+
+**Suggested settings:** PETG or ASA, 0.2 mm layers, 4 walls, 15–20% gyroid infill. PLA can soften over time next to a warm Mac Studio. The frame takes about 0.5 kg of filament. The separators print flat with 3 walls.
+
+**Hardware:** only 4–6 rack screws, plus cage nuts if your rails need them. The ear slots are 6.6 × 10 mm, which fits M6, M5 and 10-32 screws and rail hole spacings from 235 to 237 mm.
+
+**Setup:**
+
+1. Put the separators in the slots for your layout (see the table above).
+2. Mount the frame in the rack with at least 2–3 screws per ear, including the top and bottom positions.
+3. Slide the Studio in on its side, with its underside facing the left frame. Then slide in the minis. Lift each one slightly to clear the 4 mm lip on the front edge. There is 6.4 mm of headroom under the top bar.
+
+## Build B: bolt-together (235 mm bed)
+
+| File | Qty | Size (mm) | Notes |
 |---|---|---|---|
-| `side_frame_left.stl` | 1 | 221 × 207 × 22 | Prints inner face down. The rack ear stands up. |
-| `side_frame_right.stl` | 1 | 221 × 207 × 22 | Same as the left frame, mirrored. |
-| `floor.stl` | 1 | 211 × 207 × 14 | Prints top face up. |
-| `top_bar.stl` | 1 | 211 × 12 × 8 | Ties the frames together at the top front. |
-| `separator.stl` | 3 | 198 × 95 × 3 | Prints flat. Print a spare if you like. |
+| [`stl/bolted/side_frame_left.stl`](stl/bolted/side_frame_left.stl) | 1 | 221 × 207 × 22 | Prints inner face down. The rack ear stands up. |
+| [`stl/bolted/side_frame_right.stl`](stl/bolted/side_frame_right.stl) | 1 | 221 × 207 × 22 | Same as the left frame, mirrored. |
+| [`stl/bolted/floor.stl`](stl/bolted/floor.stl) | 1 | 211 × 207 × 14 | Prints top face up. |
+| [`stl/bolted/top_bar.stl`](stl/bolted/top_bar.stl) | 1 | 211 × 12 × 8 | Ties the frames together at the top front. |
+| [`stl/separator.stl`](stl/separator.stl) | 3 | 198 × 95 × 3 | Prints flat. |
 
-The largest part is 222 × 211 mm. Any bed that is 235 × 235 mm or larger works. A 250 × 210 mm bed (Prusa MK4) also works if you turn the parts lengthwise.
+![Bolt-together parts](images/exploded.png)
 
-**Suggested settings:** PETG or ASA, 0.2 mm layers. PLA can soften over time next to a warm Mac Studio.
+All parts are in print orientation and need no supports. The largest part is 222 × 211 mm. Any bed that is 235 × 235 mm or larger works. A 250 × 210 mm bed (Prusa MK4) also works if you turn the parts lengthwise.
+
+**Suggested settings:** the same material and layer height as the one-piece build.
 
 | Part | Walls | Infill |
 |---|---|---|
 | Side frames | 4 | 25% gyroid |
 | Floor | 3 | 15–20% |
 | Top bar | 4 | 40% |
-| Separators | 3 | – (the walls make them solid) |
 
-Total filament is roughly 0.6 kg.
-
-## Hardware
+**Hardware:**
 
 - 10× M3 × 16 countersunk screws (DIN 7991 / ISO 10642)
 - 10× M3 hex nuts
-- 4–6 rack screws, plus cage nuts if your rails need them. The ear slots are 6.6 × 10 mm, which fits M6, M5 and 10-32 screws and rail hole spacings from 235 to 237 mm.
+- 4–6 rack screws
 
-## Assembly
+**Assembly:**
 
 1. Drop an M3 nut into each of the 8 slots near the side edges of the floor. Slide one nut into each of the 2 slots in the back face of the top bar.
 2. Hold a side frame against each side of the floor, with the ears at the front. Fasten each frame with 4 countersunk screws from the outside.
 3. Fit the top bar between the top front corners of the frames, with one screw per side.
-4. Put the separators in the slots for your layout (see the table above).
-5. Mount the cradle in the rack with at least 2–3 screws per ear, including the top and bottom positions.
-6. Slide the Studio in on its side, with its underside facing the left frame. Then slide in the minis. Lift each one slightly to clear the 4 mm lip on the front edge. There is 6.4 mm of headroom under the top bar.
+4. Then follow the setup steps for the one-piece build.
 
-Each side frame is a triangulated truss that carries the load back to the rack ears. Even so, everything hangs from the front rails: a Studio (2.7–3.6 kg) plus two M1 minis (1.2 kg each). If your rack has a shelf or a support point under the cradle, use it.
+## Load
+
+Everything hangs from the front rails: a Studio (2.7–3.6 kg) plus two M1 minis (1.2 kg each). The diamond lattice in each side frame carries that load back to the rack ears. If your rack has a shelf or a support point under the cradle, use it as well.
 
 ## Rack requirements
 
@@ -93,6 +126,8 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 
 | Parameter | Default | What it does |
 |---|---|---|
+| `part` | `assembly` | What to render: `assembly`, `frame_onepiece`, `separator`, or a bolted part |
+| `build` | `onepiece` | Frame used in the assembly preview: `onepiece` or `bolted` |
 | `config` | `m1` | Preset used in the assembly preview: `m1`, `m4`, `m1_m4`, `m4_m1` |
 | `rack_opening` | 222.25 | Clear width between your rack's rails |
 | `rail_hole_pitch` | 236.5 | Centre-to-centre of the rail holes |
@@ -101,7 +136,5 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 | `studio_dim`, `m1_dim`, `m4_dim` | Apple specs | Device sizes used for the preview |
 
 To regenerate the STLs and images, run `./build.sh`. On a headless machine, run `xvfb-run -a ./build.sh`.
-
-![Exploded view](images/exploded.png)
 
 ![Floor with numbered slots](images/floor_slots.png)

@@ -7,9 +7,13 @@ cd "$(dirname "$0")"
 SCAD=mac_rack_shelf.scad
 mkdir -p stl images
 
-for p in side_frame_left side_frame_right floor top_bar separator; do
-  echo "STL  $p"
-  openscad -q -D "part=\"$p\"" -o "stl/$p.stl" "$SCAD" &
+mkdir -p stl/bolted
+echo "STL  frame_onepiece, separator"
+openscad -q -D 'part="frame_onepiece"' -o stl/frame_onepiece.stl "$SCAD" &
+openscad -q -D 'part="separator"' -o stl/separator.stl "$SCAD" &
+for p in side_frame_left side_frame_right floor top_bar; do
+  echo "STL  bolted/$p"
+  openscad -q -D "part=\"$p\"" -o "stl/bolted/$p.stl" "$SCAD" &
 done
 wait
 
@@ -26,5 +30,6 @@ img rear_m4         0,0,0,60,0,215,0   -D 'config="m4"'
 img front_m1        0,0,0,90,0,0,0     -D 'config="m1"' --projection=o
 img front_m4        0,0,0,90,0,0,0     -D 'config="m4"' --projection=o
 img front_m1_m4     0,0,0,90,0,0,0     -D 'config="m1_m4"' --projection=o
-img exploded        0,0,0,62,0,28,0    -D 'config="m1"' -D 'show_devices=false' -D 'explode=45'
+img exploded        0,0,0,62,0,28,0    -D 'config="m1"' -D 'show_devices=false' -D 'build="bolted"' -D 'explode=45'
+img onepiece_print  0,0,0,55,0,25,0    -D 'part="frame_onepiece"'
 img floor_slots     0,0,0,0,0,0,0      -D 'part="floor"' --projection=o
