@@ -35,13 +35,18 @@ The floor between the two slot rows is a field of diamond vents, so air can rise
 
 ## Separators and doorstops
 
-The floor has 21 slots, numbered 1–21 from the left. The numbers are engraved along the front edge of the floor.
+The floor has 6 separator slots. Count them from the left:
 
 - **Slot 1** sits against the left side frame, on the Studio's left.
 - **Slot 2** is the Studio's right-hand separator.
-- **Slots 2–21** run 5 mm apart across the mini bay.
+- **Slot 3** is where a separator goes after an M1.
+- **Slot 4** is where a separator goes after an M4.
+- **Slot 5** is where a separator goes after two M1s.
+- **Slot 6** is where a separator goes after an M1 and an M4, in either order.
 
 The slots go all the way through the 10 mm floor. Each separator drops 9.5 mm into one slot.
+
+**Why only 6 slots:** the earlier version had a slot every 5 mm. That left walls only 1.6 mm thick between slots, held only at their ends and printed with the layer lines running across them. A firm sideways push on one separator (very roughly 4 kg) could crack one. With only the slots your layouts use, the thinnest wall is 11.6 mm. Strength grows with the square of thickness, so that's about 50× stronger, and the floor is much stiffer side to side. If you ever need other bay widths, set `slot_mode = "grid"` to get the 5 mm slots back. Treat those thin walls gently.
 
 Every Mac has a separator on its left. Each separator has two small **doorstops** on its right-hand side. They hook 7 mm around the front and back edges of the Mac to their right, so that Mac can't slide out the front or back of the rack. They don't wrap all the way around.
 
@@ -54,10 +59,10 @@ The rear doorstop has to sit right behind the Mac it holds, so there are two sep
 
 | Layout | Separators in slots | Bays (left → right) |
 |---|---|---|
-| Studio + 2× M1 | **1, 2, 10, 18**, all Studio/M1 | Studio 96.4 · M1 37 · M1 37 · spare 27 mm |
-| Studio + 2× M4 | **1** Studio/M1, **2, 13** M4 | Studio 96.4 · M4 52 · M4 52 mm (against the side frame) |
-| Studio + M1 + M4 | **1, 2** Studio/M1, **10** M4, **21** Studio/M1 | Studio 96.4 · M1 37 · M4 52 · spare 12 mm |
-| Studio + M4 + M1 | **1** Studio/M1, **2** M4, **13, 21** Studio/M1 | Studio 96.4 · M4 52 · M1 37 · spare 12 mm |
+| Studio + 2× M1 | **1, 2, 3, 5**, all Studio/M1 | Studio 96.4 · M1 37 · M1 37 · spare 27 mm |
+| Studio + 2× M4 | **1** Studio/M1, **2, 4** M4 | Studio 96.4 · M4 52 · M4 52 mm (against the side frame) |
+| Studio + M1 + M4 | **1, 2** Studio/M1, **3** M4, **6** Studio/M1 | Studio 96.4 · M1 37 · M4 52 · spare 12 mm |
+| Studio + M4 + M1 | **1** Studio/M1, **2** M4, **4, 6** Studio/M1 | Studio 96.4 · M4 52 · M1 37 · spare 12 mm |
 
 Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. Front-to-back play between the doorstops is 1 mm. For your M1 setup, print four Studio/M1 separators. When you move to M4 minis, print two M4 separators.
 
@@ -171,6 +176,7 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 | `slot_w` / `tab_clear` | 3.4 / 0.3 | Separator fit. Raise `slot_w` if the tabs are too tight on your printer. |
 | `floor_vents` | `true` | Diamond vents in the floor between the slot rows |
 | `vent_spine` | 10 | Width of the solid band across the middle of the vents (0 removes it) |
+| `slot_mode` | `presets` | `presets`: the 6 slots the layouts use. `grid`: a slot every 5 mm (thinner walls). |
 | `doorstop_rear` | `true` | Set to `false` for front doorstops only, so any Mac slides out on its own |
 | `doorstop_reach` | 7 | How far each doorstop hooks across a Mac's front or back edge |
 | `studio_play` | 1.4 | Side-to-side play in the Studio bay. This also sets where slot 1 sits. |
@@ -180,4 +186,4 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 
 To regenerate the STLs and images, run `./build.sh`. On a headless machine, run `xvfb-run -a ./build.sh`.
 
-![Floor with numbered slots](images/floor_slots.png)
+![Floor with separator slots and vents](images/floor_slots.png)

@@ -12,7 +12,7 @@
 //      |S|  on its side   |S|        |S|        |S|                  |
 //      | |  (96.4 mm bay) | |        | |        | |                  |
 //      +=+================+=+========+=+========+=+==================+
-//       1                 |<- slots 2-21, 5 mm pitch ->|
+//       1                 2        3   4     5    6     (separator slots)
 //
 //  Separators drop into numbered slots, so the same frame takes
 //  M1 minis (36 mm thick), M4 minis (50 mm), or a mix. Every Mac has a
@@ -72,8 +72,13 @@ rear_lip_h  = 4;
 rear_lip_t  = 3.5;  // bolted floor only; the one-piece floor uses a 45 deg ramp
 
 /* [Separator slots] */
+// presets: only the 6 slots the M1/M4 layouts use (thick floor between them)
+// grid:    a slot every slot_pitch mm, for odd-sized devices (1.6 mm walls between slots)
+slot_mode   = "presets";   // [presets, grid]
 slot_pitch  = 5;
 slot_w      = 3.4;
+m1_play     = 1;     // side-to-side play in an M1 bay (37 mm bay)
+m4_play     = 2;     // side-to-side play in an M4 bay (52 mm bay)
 slot_rows   = [[8, 38], [155, 185]];   // Y ranges of the two slot rows (cut through the floor)
 studio_play = 1.4;   // side-to-side play in the Studio bay; sets where slot 2 sits
 slot_wall   = 1.2;   // floor left between slot 1 and the left side plate
@@ -134,22 +139,34 @@ bar_bolt_y = y_front + bar_d / 2;
 bar_bolt_z = panel_h - bar_h / 2;
 
 // Slot 1 sits against the left side plate, on the Studio's left. Slot 2 is
-// the Studio's right-hand separator; slots 2 onward run 5 mm apart until a
-// separator's doorstops would hit the right side plate. The floor under
-// the Studio has no slots.
-slot_x1    = -xi + slot_w / 2 + slot_wall;
-slot_x0    = slot_x1 + sep_t + studio_dim[2] + studio_play;
-slot_count = 1 + floor((xi - doorstop_reach - sep_t / 2 - 0.5 - slot_x0) / slot_pitch) + 1;   // 21
-function slot_x(n) = n == 1 ? slot_x1 : slot_x0 + (n - 2) * slot_pitch;
+// the Studio's right-hand separator. The rest sit where a separator lands
+// after one or two minis (M1 or M4), unless its doorstops would hit the
+// right side plate. The floor under the Studio has no slots.
+slot_x1 = -xi + slot_w / 2 + slot_wall;
+slot_x0 = slot_x1 + sep_t + studio_dim[2] + studio_play;
 
-// Separator slot numbers for each preset, left to right. The first two
-// always frame the Studio.
-function preset(c) =
-    c == "m1"    ? [1, 2, 10, 18] :
-    c == "m4"    ? [1, 2, 13] :
-    c == "m1_m4" ? [1, 2, 10, 21] :
-    c == "m4_m1" ? [1, 2, 13, 21] :
-                   [1, 2];
+function bay_w(kind) = kind == "m4" ? m4_dim[2] + m4_play : m1_dim[2] + m1_play;
+function slot_fits(x) = x + sep_t / 2 + doorstop_reach + 0.5 <= xi;
+// Separator positions from the Studio's right-hand separator onward, for a
+// list of minis left to right. The last one is left out when the final
+// mini simply sits against the side plate.
+function mini_xs(devs, i = 0, x = slot_x0) =
+    i < len(devs)
+        ? concat([x], mini_xs(devs, i + 1, x + sep_t + bay_w(devs[i])))
+        : (slot_fits(x) ? [x] : []);
+
+function qsort(v) = len(v) <= 1 ? v : let(p = v[0])
+    concat(qsort([for (x = v) if (x < p) x]), [for (x = v) if (x == p) x], qsort([for (x = v) if (x > p) x]));
+function dedupe(v) = [for (i = [0 : len(v) - 1]) if (i == 0 || v[i] - v[i - 1] > 0.01) v[i]];
+
+combos = [["m1"], ["m4"], ["m1", "m1"], ["m1", "m4"], ["m4", "m1"], ["m4", "m4"]];
+slot_xs = slot_mode == "grid"
+    ? concat([slot_x1], [for (x = [slot_x0 : slot_pitch : xi]) if (slot_fits(x)) x])
+    : concat([slot_x1], dedupe(qsort([for (c = combos) each mini_xs(c)])));
+slot_count = len(slot_xs);                     // 6 in preset mode
+function slot_x(n) = slot_xs[n - 1];
+// slot number (1 = far left) of a separator position
+function slot_no(x) = [for (i = [0 : slot_count - 1]) if (abs(slot_xs[i] - x) < 0.01) i + 1][0];
 
 // Minis that fill the bays to the right of the Studio, left to right
 function preset_devices(c) =
@@ -158,6 +175,10 @@ function preset_devices(c) =
     c == "m1_m4" ? ["m1", "m4"] :
     c == "m4_m1" ? ["m4", "m1"] :
                    [];
+
+// Separator positions for a preset: left of the Studio, right of the Studio,
+// then one after each mini that needs it.
+function preset_xs(c) = concat([slot_x1], mini_xs(preset_devices(c)));
 
 function dev_depth(kind) = kind == "m4" ? m4_dim[1] : kind == "m1" ? m1_dim[1] : studio_dim[1];
 // Depth of the Mac held by separator k of a preset (the Mac on its right).
@@ -302,16 +323,10 @@ module floor_part(bolts = true, ramp = false, ov = 0) {
                 translate([-xi - ov, y_back - rear_lip_t, floor_t - eps]) cube([w, rear_lip_t, rear_lip_h + eps]);
         }
         // separator slots, cut all the way through the floor
-        for (n = [1 : slot_count], r = slot_rows)
-            translate([slot_x(n) - slot_w / 2, r[0], -1])
+        for (x = slot_xs, r = slot_rows)
+            translate([x - slot_w / 2, r[0], -1])
                 cube([slot_w, r[1] - r[0], floor_t + 2]);
         if (floor_vents) floor_vent_holes();
-        // slot numbers, read from the front like a ruler
-        for (n = [1 : slot_count])
-            translate([slot_x(n), y_front + lip_t + 0.8, floor_t - 0.6])
-                linear_extrude(1) rotate(90)
-                    text(str(n), size = 3.4, font = "Liberation Sans:style=Bold",
-                         halign = "left", valign = "center");
         // side bolts + nut traps
         if (bolts) for (s = [-1, 1], y = floor_bolt_y) {
             translate([s * xi, y, floor_bolt_z]) mirror([s > 0 ? 1 : 0, 0, 0]) bolt_hole(nut_inset + 6);
@@ -463,7 +478,7 @@ c_floor = "#3b4045";
 c_sep   = "#f28c28";
 
 module assembly() {
-    seps = preset(config);
+    seps = preset_xs(config);
     devs = preset_devices(config);
     e = build == "bolted" ? explode : 0;
     if (build == "bolted") {
@@ -475,12 +490,12 @@ module assembly() {
         color(c_frame) frame_onepiece();
     }
     color(c_sep) for (k = [0 : len(seps) - 1])
-        translate([slot_x(seps[k]), 0, e / 2]) separator(sep_hold(config, k));
+        translate([seps[k], 0, e / 2]) separator(sep_hold(config, k));
     if (show_devices) translate([0, -2 * e, 0]) {
-        studio_dummy((slot_x(seps[0]) + slot_x(seps[1]) - studio_dim[2]) / 2);
+        studio_dummy((seps[0] + seps[1] - studio_dim[2]) / 2);
         if (len(devs) > 0) for (i = [0 : len(devs) - 1]) {
-            bay_l = slot_x(seps[i + 1]) + sep_t / 2;
-            bay_r = (i + 2 < len(seps)) ? slot_x(seps[i + 2]) - sep_t / 2 : xi;
+            bay_l = seps[i + 1] + sep_t / 2;
+            bay_r = (i + 2 < len(seps)) ? seps[i + 2] - sep_t / 2 : xi;
             w = devs[i] == "m4" ? m4_dim[2] : m1_dim[2];
             mini_dummy(devs[i], (bay_l + bay_r - w) / 2);
         }
@@ -516,6 +531,7 @@ else if (part == "separator_studio_m1") print_separator(studio_dim[1]);
 else if (part == "separator_m4")     print_separator(m4_dim[1]);
 
 // Echo the useful numbers when rendering
-echo(str("inner width = ", inner_w, " mm, slots = ", slot_count,
-         ", slot 1 x = ", slot_x(1), ", slot 2 x = ", slot_x(2),
+echo(str("inner width = ", inner_w, " mm, ", slot_count, " slots at x = ", slot_xs,
          ", Studio bay = ", slot_x(2) - slot_x(1) - sep_t, " mm"));
+for (c = ["m1", "m4", "m1_m4", "m4_m1"])
+    echo(str("preset ", c, ": slots ", [for (x = preset_xs(c)) slot_no(x)]));
