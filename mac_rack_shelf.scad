@@ -10,9 +10,9 @@
 //      |<-------------- 210.75 mm between side plates -------------->|
 //      |  Mac Studio      | |  mini  | |  mini  | |   spare / gap    |
 //      |  on its side     |S|        |S|        |S|                  |
-//      |  (97 mm bay)     | |        | |        | |                  |
+//      |  (96.4 mm bay)   | |        | |        | |                  |
 //      +==================+=+========+=+========+=+==================+
-//                       floor with 42 separator slots (5 mm pitch)
+//                         |<- 23 separator slots, 5 mm pitch ->|
 //
 //  Separators drop into numbered slots, so the same frame takes
 //  M1 minis (36 mm thick), M4 minis (50 mm), or a mix.
@@ -73,13 +73,15 @@ rear_lip_t  = 3.5;  // bolted floor only; the one-piece floor uses a 45 deg ramp
 slot_pitch  = 5;
 slot_w      = 3.4;
 slot_rows   = [[8, 38], [155, 185]];   // Y ranges of the two slot rows (cut through the floor)
+studio_play = 1.4;   // side-to-side play in the Studio bay; sets where slot 1 sits
 
 /* [Floor vents] */
 floor_vents      = true;
 vent_pitch       = 22;   // diamond centre spacing
 vent_strut       = 5;    // rib width between diamonds (45 deg, prints without supports)
 vent_side_margin = 16;   // solid floor kept along each side plate
-vent_row_margin  = 6;    // solid floor kept next to each slot row
+vent_row_margin  = 5;    // solid floor kept next to each slot row
+vent_spine       = 10;   // solid left-to-right band across the middle of the vents (0 = none)
 
 /* [Separators] */
 sep_t       = 3;
@@ -117,19 +119,20 @@ y_back   = depth;
 bar_bolt_y = y_front + bar_d / 2;
 bar_bolt_z = panel_h - bar_h / 2;
 
-// Slots sit on odd multiples of pitch/2 so the grid is symmetric and the
-// Studio bay works on either side.
-slot_half  = floor((xi - slot_w / 2 - 1) / slot_pitch + 0.5);
-slot_count = 2 * slot_half;                  // 42 with the defaults
-function slot_x(n) = (n - (slot_count + 1) / 2) * slot_pitch;
+// Slots only exist beside the Studio. Slot 1 is the Studio's separator;
+// the rest run 5 mm apart to the right side plate. The floor under the
+// Studio has no slots.
+slot_x0    = -xi + studio_dim[2] + studio_play + sep_t / 2;
+slot_count = floor((xi - slot_w / 2 - 1 - slot_x0) / slot_pitch) + 1;   // 23 with the defaults
+function slot_x(n) = slot_x0 + (n - 1) * slot_pitch;
 
-// Separator slot numbers (1 = far left) for each preset
+// Separator slot numbers for each preset (slot 1 = beside the Studio)
 function preset(c) =
-    c == "m1"    ? [20, 28, 36] :
-    c == "m4"    ? [20, 31, 42] :
-    c == "m1_m4" ? [20, 28, 39] :
-    c == "m4_m1" ? [20, 31, 39] :
-                   [20];
+    c == "m1"    ? [1, 9, 17] :
+    c == "m4"    ? [1, 12, 23] :
+    c == "m1_m4" ? [1, 9, 20] :
+    c == "m4_m1" ? [1, 12, 20] :
+                   [1];
 
 // Devices that fill the bays left to right
 function preset_devices(c) =
@@ -238,10 +241,18 @@ module nut_slot_from_top(z_axis, z_top) {
 // edges, so they print without supports flat (bolted floor) or standing
 // up (one-piece frame printed face-down).
 module floor_vent_holes() {
-    h     = vent_pitch / 2 - vent_strut / sqrt(2);   // half-diagonal
-    x_lim = xi - vent_side_margin;
     y_lo  = slot_rows[0][1] + vent_row_margin;
     y_hi  = slot_rows[1][0] - vent_row_margin;
+    y_mid = (y_lo + y_hi) / 2;
+    fields = vent_spine > 0
+        ? [[y_lo, y_mid - vent_spine / 2], [y_mid + vent_spine / 2, y_hi]]
+        : [[y_lo, y_hi]];
+    for (f = fields) vent_field(f[0], f[1]);
+}
+
+module vent_field(y_lo, y_hi) {
+    h     = vent_pitch / 2 - vent_strut / sqrt(2);   // half-diagonal
+    x_lim = xi - vent_side_margin;
     step  = vent_pitch / 2;
     m     = floor((y_hi - y_lo - 2 * h) / step);
     y0    = (y_lo + y_hi) / 2 - m * step / 2;
@@ -457,4 +468,4 @@ else if (part == "separator")        print_separator();
 
 // Echo the useful numbers when rendering
 echo(str("inner width = ", inner_w, " mm, slots = ", slot_count,
-         ", slot 1 x = ", slot_x(1), ", Studio bay = ", slot_x(20) - sep_t / 2 + xi, " mm"));
+         ", slot 1 x = ", slot_x(1), ", Studio bay = ", slot_x(1) - sep_t / 2 + xi, " mm"));

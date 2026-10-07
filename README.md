@@ -31,22 +31,22 @@ The tallest device is 197 mm, so the cradle is 5U (222.25 mm).
 
 The Studio's air intake is on its underside, so that face goes against the open left side frame. Exhaust from all three Macs goes out the back, which is open.
 
-The floor between the two slot rows is a field of diamond vents, so air can rise into the bays from below. The vents only help if the rack space under the cradle is open (an empty or vented U), not blocked by another device.
+The floor between the two slot rows is a field of diamond vents, so air can rise into the bays from below. A solid band runs side to side across the middle of the vents. It stiffens the floor where it would otherwise sag most. The vents only help if the rack space under the cradle is open (an empty or vented U), not blocked by another device.
 
 ## Separator slots
 
-The floor has 42 slots at a 5 mm pitch. They are numbered 1–42 from the left, and the numbers are engraved along the front edge of the floor. The slots go all the way through the 10 mm floor. Each separator has two tabs that drop 9.5 mm into one slot position.
+The floor has 23 slots, 5 mm apart, all to the right of the Studio. They are numbered 1–23 from the left, and the numbers are engraved along the front edge of the floor. Slot 1 is always the Studio's separator. The slots go all the way through the 10 mm floor. Each separator has two tabs that drop 9.5 mm into one slot position.
 
 | Layout | Separators in slots | Bays (left → right) |
 |---|---|---|
-| Studio + 2× M1 | **20, 28, 36** | Studio 96.4 · M1 37 · M1 37 · spare 31.4 mm |
-| Studio + 2× M4 | **20, 31, 42** | Studio 96.4 · M4 52 · M4 52 mm |
-| Studio + M1 + M4 | **20, 28, 39** | Studio 96.4 · M1 37 · M4 52 · spare 16.4 mm |
-| Studio + M4 + M1 | **20, 31, 39** | Studio 96.4 · M4 52 · M1 37 · spare 16.4 mm |
+| Studio + 2× M1 | **1, 9, 17** | Studio 96.4 · M1 37 · M1 37 · spare 31.3 mm |
+| Studio + 2× M4 | **1, 12, 23** | Studio 96.4 · M4 52 · M4 52 mm |
+| Studio + M1 + M4 | **1, 9, 20** | Studio 96.4 · M1 37 · M4 52 · spare 16.3 mm |
+| Studio + M4 + M1 | **1, 12, 20** | Studio 96.4 · M4 52 · M1 37 · spare 16.3 mm |
 
-Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. The slot grid is symmetric, so the Studio can go on the right instead. Then the separators go in slots **23, 15, 7** for M1 minis or **23, 12, 1** for M4 minis.
+Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. The Studio always goes in the left bay. The floor under it has no slots, so it stays solid under the heaviest Mac.
 
-The spare bay in the M1 layout (~31 mm) is wide enough for something thin, such as a USB hub or a slim SSD enclosure.
+The spare bay in the M1 layout (about 31 mm) is wide enough for something thin, such as a USB hub or a slim SSD enclosure.
 
 ## Build A: one piece (256 mm printer)
 
@@ -136,6 +136,8 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 | `rail_hole_pitch` | 236.5 | Centre-to-centre of the rail holes |
 | `slot_w` / `tab_clear` | 3.4 / 0.3 | Separator fit. Raise `slot_w` if the tabs are too tight on your printer. |
 | `floor_vents` | `true` | Diamond vents in the floor between the slot rows |
+| `vent_spine` | 10 | Width of the solid band across the middle of the vents (0 removes it) |
+| `studio_play` | 1.4 | Side-to-side play in the Studio bay. This also sets where slot 1 sits. |
 | `vent_pitch` / `vent_strut` | 22 / 5 | Vent size and rib width |
 | `sep_h` | 90 | Separator height above the floor |
 | `studio_dim`, `m1_dim`, `m4_dim` | Apple specs | Device sizes used for the preview |
