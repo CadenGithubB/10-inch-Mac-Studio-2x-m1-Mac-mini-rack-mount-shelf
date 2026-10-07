@@ -8,26 +8,28 @@
 //  Layout (front view):
 //
 //      |<-------------- 210.75 mm between side plates -------------->|
-//      |  Mac Studio      | |  mini  | |  mini  | |   spare / gap    |
-//      |  on its side     |S|        |S|        |S|                  |
-//      |  (96.4 mm bay)   | |        | |        | |                  |
-//      +==================+=+========+=+========+=+==================+
-//                         |<- 23 separator slots, 5 mm pitch ->|
+//      | |  Mac Studio    | |  mini  | |  mini  | |   spare / gap    |
+//      |S|  on its side   |S|        |S|        |S|                  |
+//      | |  (96.4 mm bay) | |        | |        | |                  |
+//      +=+================+=+========+=+========+=+==================+
+//       1                 |<- slots 2-21, 5 mm pitch ->|
 //
 //  Separators drop into numbered slots, so the same frame takes
-//  M1 minis (36 mm thick), M4 minis (50 mm), or a mix.
+//  M1 minis (36 mm thick), M4 minis (50 mm), or a mix. Every Mac has a
+//  separator on its left, and each separator has small doorstops on its
+//  right-hand side that hook around the front (and back) edge of that Mac.
 //
 //  Coordinates (assembled):  X = left/right (0 = rack centre),
 //  Y = depth (0 = back face of the rack ears, + towards the rear),
 //  Z = up (0 = bottom of the frame).
 //
 //  Render one part:   openscad -D 'part="frame_onepiece"' -o frame.stl mac_rack_shelf.scad
-//  Parts: assembly | frame_onepiece | separator
+//  Parts: assembly | frame_onepiece | separator_studio_m1 | separator_m4
 //         side_frame_left | side_frame_right | floor | top_bar   (bolted build)
 // =====================================================================
 
 /* [View] */
-part   = "assembly";  // [assembly, frame_onepiece, separator, side_frame_left, side_frame_right, floor, top_bar]
+part   = "assembly";  // [assembly, frame_onepiece, separator_studio_m1, separator_m4, side_frame_left, side_frame_right, floor, top_bar]
 // Frame shown in the assembly preview
 build  = "onepiece";  // [onepiece, bolted]
 // Preset separator layout used by the assembly preview
@@ -73,7 +75,8 @@ rear_lip_t  = 3.5;  // bolted floor only; the one-piece floor uses a 45 deg ramp
 slot_pitch  = 5;
 slot_w      = 3.4;
 slot_rows   = [[8, 38], [155, 185]];   // Y ranges of the two slot rows (cut through the floor)
-studio_play = 1.4;   // side-to-side play in the Studio bay; sets where slot 1 sits
+studio_play = 1.4;   // side-to-side play in the Studio bay; sets where slot 2 sits
+slot_wall   = 1.2;   // floor left between slot 1 and the left side plate
 
 /* [Floor vents] */
 floor_vents      = true;
@@ -88,6 +91,17 @@ sep_t       = 3;
 sep_h       = 90;    // height above the floor
 tab_clear   = 0.3;   // per end, along Y
 tab_depth   = 9.5;   // tabs reach 0.5 mm short of the floor's underside
+
+/* [Doorstops] */
+// Each separator holds the Mac on its right: a doorstop in front of it and
+// one behind it. They print flat with the separator, pointing up.
+doorstop_reach = 7;          // how far a doorstop reaches across the Mac's front/back
+doorstop_t     = 3;          // doorstop thickness, front to back
+doorstop_z     = [16, 70];   // height of the front doorstop and the Studio/M1 rear one
+m4_rear_z      = [56, 94];   // the M4 rear doorstop sits high so the separator lifts out over an M4
+doorstop_rear  = true;       // false: front doorstops only, so any Mac slides out on its own
+dev_front      = -1;         // front face of the Macs (back of the floor's front lip)
+dev_play_y     = 1;          // front-to-back play between the doorstops
 
 /* [Top bar] */
 bar_h       = 8;
@@ -119,28 +133,37 @@ y_back   = depth;
 bar_bolt_y = y_front + bar_d / 2;
 bar_bolt_z = panel_h - bar_h / 2;
 
-// Slots only exist beside the Studio. Slot 1 is the Studio's separator;
-// the rest run 5 mm apart to the right side plate. The floor under the
-// Studio has no slots.
-slot_x0    = -xi + studio_dim[2] + studio_play + sep_t / 2;
-slot_count = floor((xi - slot_w / 2 - 1 - slot_x0) / slot_pitch) + 1;   // 23 with the defaults
-function slot_x(n) = slot_x0 + (n - 1) * slot_pitch;
+// Slot 1 sits against the left side plate, on the Studio's left. Slot 2 is
+// the Studio's right-hand separator; slots 2 onward run 5 mm apart until a
+// separator's doorstops would hit the right side plate. The floor under
+// the Studio has no slots.
+slot_x1    = -xi + slot_w / 2 + slot_wall;
+slot_x0    = slot_x1 + sep_t + studio_dim[2] + studio_play;
+slot_count = 1 + floor((xi - doorstop_reach - sep_t / 2 - 0.5 - slot_x0) / slot_pitch) + 1;   // 21
+function slot_x(n) = n == 1 ? slot_x1 : slot_x0 + (n - 2) * slot_pitch;
 
-// Separator slot numbers for each preset (slot 1 = beside the Studio)
+// Separator slot numbers for each preset, left to right. The first two
+// always frame the Studio.
 function preset(c) =
-    c == "m1"    ? [1, 9, 17] :
-    c == "m4"    ? [1, 12, 23] :
-    c == "m1_m4" ? [1, 9, 20] :
-    c == "m4_m1" ? [1, 12, 20] :
-                   [1];
+    c == "m1"    ? [1, 2, 10, 18] :
+    c == "m4"    ? [1, 2, 13] :
+    c == "m1_m4" ? [1, 2, 10, 21] :
+    c == "m4_m1" ? [1, 2, 13, 21] :
+                   [1, 2];
 
-// Devices that fill the bays left to right
+// Minis that fill the bays to the right of the Studio, left to right
 function preset_devices(c) =
     c == "m1"    ? ["m1", "m1"] :
     c == "m4"    ? ["m4", "m4"] :
     c == "m1_m4" ? ["m1", "m4"] :
     c == "m4_m1" ? ["m4", "m1"] :
                    [];
+
+function dev_depth(kind) = kind == "m4" ? m4_dim[1] : kind == "m1" ? m1_dim[1] : studio_dim[1];
+// Depth of the Mac held by separator k of a preset (the Mac on its right).
+// A separator with nothing on its right gets the long doorstops.
+function sep_hold(c, k) = let(d = preset_devices(c))
+    k == 0 ? studio_dim[1] : (k - 1 < len(d) ? dev_depth(d[k - 1]) : studio_dim[1]);
 
 // ---------------------------------------------------------------------
 // Helpers
@@ -337,17 +360,26 @@ module frame_onepiece() {
 sep_y0 = -0.5;
 sep_y1 = y_back - max(rear_lip_t, rear_lip_h) - 0.5;
 
-module separator_profile() {   // 2D in (Y, Z)
-    body_h = sep_h;
+function rear_stop_y(depth) = dev_front + depth + dev_play_y;   // inner face of the rear doorstop
+function rear_is_mid(depth) = rear_stop_y(depth) + doorstop_t < sep_y1 - 12;
+function rear_z(depth) = rear_is_mid(depth) ? m4_rear_z : doorstop_z;
+
+module separator_body(body_h) {
+    translate([sep_y0, floor_t]) hull() {
+        square([1, 1]);
+        translate([sep_y1 - sep_y0 - 1, 0]) square([1, 1]);
+        translate([28, body_h - 28]) circle(r = 28);
+        translate([sep_y1 - sep_y0 - 8, body_h - 8]) circle(r = 8);
+    }
+}
+
+// hold: depth of the Mac on the separator's right (197 Studio/M1, 127 M4)
+module separator_profile(hold) {   // 2D in (Y, Z)
+    yr = rear_stop_y(hold);
+    rz = rear_z(hold);
     difference() {
         union() {
-            // body with a big radius on the top-front corner
-            translate([sep_y0, floor_t]) hull() {
-                square([1, 1]);
-                translate([sep_y1 - sep_y0 - 1, 0]) square([1, 1]);
-                translate([28, body_h - 28]) circle(r = 28);
-                translate([sep_y1 - sep_y0 - 8, body_h - 8]) circle(r = 8);
-            }
+            separator_body(sep_h);
             // tabs, chamfered at the bottom for easy insertion
             for (r = slot_rows) {
                 a = r[0] + tab_clear;
@@ -356,26 +388,41 @@ module separator_profile() {   // 2D in (Y, Z)
                 polygon([[a, floor_t + eps], [a, floor_t - tab_depth + c], [a + c, floor_t - tab_depth],
                          [b - c, floor_t - tab_depth], [b, floor_t - tab_depth + c], [b, floor_t + eps]]);
             }
+            // plate reaches forward to carry the front doorstop
+            translate([dev_front - doorstop_t, doorstop_z[0]])
+                square([sep_y0 + 1 - dev_front + doorstop_t, doorstop_z[1] - doorstop_z[0]]);
+            // ...and back to carry a rear doorstop that sits past the plate
+            if (doorstop_rear && !rear_is_mid(hold))
+                translate([sep_y1 - 1, rz[0]]) square([yr + doorstop_t - sep_y1 + 1, rz[1] - rz[0]]);
         }
-        // vent / grip windows
+        // vent / grip windows; one strut always lands under the M4 rear doorstop
+        struts = [67, rear_stop_y(m4_dim[1]) + doorstop_t / 2];
         offset(r = 5) offset(delta = -5)
         difference() {
             intersection() {
-                offset(delta = -11) translate([sep_y0, floor_t]) hull() {
-                    square([1, 1]);
-                    translate([sep_y1 - sep_y0 - 1, 0]) square([1, 1]);
-                    translate([28, body_h - 28]) circle(r = 28);
-                    translate([sep_y1 - sep_y0 - 8, body_h - 8]) circle(r = 8);
-                }
+                offset(delta = -11) separator_body(sep_h);
                 translate([-100, floor_t + 12]) square([1000, 1000]);
             }
-            for (y = [52, 99, 146]) translate([y - 4, 0]) square([8, 1000]);
+            for (y = struts) translate([y - 4, 0]) square([8, 1000]);
+            if (rear_is_mid(hold)) translate([yr + doorstop_t / 2 - 4, 0]) square([8, 1000]);
         }
     }
 }
 
-module separator() {
-    rotate([90, 0, 90]) linear_extrude(sep_t, center = true) separator_profile();
+// Doorstop on the separator's right face, covering y in [y_a, y_a + doorstop_t]
+module doorstop(y_a, z_range) {
+    c = min(3, doorstop_reach / 2);
+    r = doorstop_reach;
+    translate([sep_t / 2 - eps, y_a + doorstop_t, 0]) rotate([90, 0, 0])
+        linear_extrude(doorstop_t)
+            polygon([[0, z_range[0]], [r - c, z_range[0]], [r, z_range[0] + c],
+                     [r, z_range[1] - c], [r - c, z_range[1]], [0, z_range[1]]]);
+}
+
+module separator(hold = 197) {
+    rotate([90, 0, 90]) linear_extrude(sep_t, center = true) separator_profile(hold);
+    doorstop(dev_front - doorstop_t, doorstop_z);
+    if (doorstop_rear) doorstop(rear_stop_y(hold), rear_z(hold));
 }
 
 // ---------------------------------------------------------------------
@@ -427,12 +474,13 @@ module assembly() {
     } else {
         color(c_frame) frame_onepiece();
     }
-    color(c_sep) for (n = seps) translate([slot_x(n), 0, e / 2]) separator();
+    color(c_sep) for (k = [0 : len(seps) - 1])
+        translate([slot_x(seps[k]), 0, e / 2]) separator(sep_hold(config, k));
     if (show_devices) translate([0, -2 * e, 0]) {
-        studio_dummy(-xi + 0.7);
+        studio_dummy((slot_x(seps[0]) + slot_x(seps[1]) - studio_dim[2]) / 2);
         if (len(devs) > 0) for (i = [0 : len(devs) - 1]) {
-            bay_l = slot_x(seps[i]) + sep_t / 2;
-            bay_r = (i + 1 < len(seps)) ? slot_x(seps[i + 1]) - sep_t / 2 : xi;
+            bay_l = slot_x(seps[i + 1]) + sep_t / 2;
+            bay_r = (i + 2 < len(seps)) ? slot_x(seps[i + 2]) - sep_t / 2 : xi;
             w = devs[i] == "m4" ? m4_dim[2] : m1_dim[2];
             mini_dummy(devs[i], (bay_l + bay_r - w) / 2);
         }
@@ -454,8 +502,8 @@ module print_side_frame_left() {
 module print_top_bar() {
     translate([0, 0, -(panel_h - bar_h)]) top_bar();
 }
-module print_separator() {             // lying flat
-    rotate([0, 90, 0]) translate([-sep_t / 2, 0, 0]) separator();
+module print_separator(hold) {         // lying flat on its left face, doorstops up
+    rotate([0, -90, 0]) translate([sep_t / 2, 0, 0]) separator(hold);
 }
 
 if (part == "assembly")              assembly();
@@ -464,8 +512,10 @@ else if (part == "side_frame_right") print_side_frame_right();
 else if (part == "side_frame_left")  print_side_frame_left();
 else if (part == "floor")            floor_part();
 else if (part == "top_bar")          print_top_bar();
-else if (part == "separator")        print_separator();
+else if (part == "separator_studio_m1") print_separator(studio_dim[1]);
+else if (part == "separator_m4")     print_separator(m4_dim[1]);
 
 // Echo the useful numbers when rendering
 echo(str("inner width = ", inner_w, " mm, slots = ", slot_count,
-         ", slot 1 x = ", slot_x(1), ", Studio bay = ", slot_x(1) - sep_t / 2 + xi, " mm"));
+         ", slot 1 x = ", slot_x(1), ", slot 2 x = ", slot_x(2),
+         ", Studio bay = ", slot_x(2) - slot_x(1) - sep_t, " mm"));

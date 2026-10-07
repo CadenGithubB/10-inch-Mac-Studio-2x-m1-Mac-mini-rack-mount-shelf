@@ -29,24 +29,58 @@ On its side the Studio is 95 mm wide. That leaves about 110 mm next to it, which
 
 The tallest device is 197 mm, so the cradle is 5U (222.25 mm).
 
-The Studio's air intake is on its underside, so that face goes against the open left side frame. Exhaust from all three Macs goes out the back, which is open.
+The Studio's air intake is on its underside, so that face goes to the left. It faces the open slot-1 separator and the diamond cutouts in the left side frame. Exhaust from all three Macs goes out the back, which is open.
 
 The floor between the two slot rows is a field of diamond vents, so air can rise into the bays from below. A solid band runs side to side across the middle of the vents. It stiffens the floor where it would otherwise sag most. The vents only help if the rack space under the cradle is open (an empty or vented U), not blocked by another device.
 
-## Separator slots
+## Separators and doorstops
 
-The floor has 23 slots, 5 mm apart, all to the right of the Studio. They are numbered 1–23 from the left, and the numbers are engraved along the front edge of the floor. Slot 1 is always the Studio's separator. The slots go all the way through the 10 mm floor. Each separator has two tabs that drop 9.5 mm into one slot position.
+The floor has 21 slots, numbered 1–21 from the left. The numbers are engraved along the front edge of the floor.
+
+- **Slot 1** sits against the left side frame, on the Studio's left.
+- **Slot 2** is the Studio's right-hand separator.
+- **Slots 2–21** run 5 mm apart across the mini bay.
+
+The slots go all the way through the 10 mm floor. Each separator drops 9.5 mm into one slot.
+
+Every Mac has a separator on its left. Each separator has two small **doorstops** on its right-hand side. They hook 7 mm around the front and back edges of the Mac to their right, so that Mac can't slide out the front or back of the rack. They don't wrap all the way around.
+
+The rear doorstop has to sit right behind the Mac it holds, so there are two separator versions:
+
+| File | Holds | Rear doorstop |
+|---|---|---|
+| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl) | the Studio or an M1 (197 mm deep) | at the back end, 197 mm behind the front |
+| [`stl/separator_m4.stl`](stl/separator_m4.stl) | an M4 (127 mm deep) | partway back, set high |
 
 | Layout | Separators in slots | Bays (left → right) |
 |---|---|---|
-| Studio + 2× M1 | **1, 9, 17** | Studio 96.4 · M1 37 · M1 37 · spare 31.3 mm |
-| Studio + 2× M4 | **1, 12, 23** | Studio 96.4 · M4 52 · M4 52 mm |
-| Studio + M1 + M4 | **1, 9, 20** | Studio 96.4 · M1 37 · M4 52 · spare 16.3 mm |
-| Studio + M4 + M1 | **1, 12, 20** | Studio 96.4 · M4 52 · M1 37 · spare 16.3 mm |
+| Studio + 2× M1 | **1, 2, 10, 18**, all Studio/M1 | Studio 96.4 · M1 37 · M1 37 · spare 27 mm |
+| Studio + 2× M4 | **1** Studio/M1, **2, 13** M4 | Studio 96.4 · M4 52 · M4 52 mm (against the side frame) |
+| Studio + M1 + M4 | **1, 2** Studio/M1, **10** M4, **21** Studio/M1 | Studio 96.4 · M1 37 · M4 52 · spare 12 mm |
+| Studio + M4 + M1 | **1** Studio/M1, **2** M4, **13, 21** Studio/M1 | Studio 96.4 · M4 52 · M1 37 · spare 12 mm |
 
-Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. The Studio always goes in the left bay. The floor under it has no slots, so it stays solid under the heaviest Mac.
+Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. Front-to-back play between the doorstops is 1 mm. For your M1 setup, print four Studio/M1 separators. When you move to M4 minis, print two M4 separators.
 
-The spare bay in the M1 layout (about 31 mm) is wide enough for something thin, such as a USB hub or a slim SSD enclosure.
+The floor under the Studio has no slots, so it stays solid under the heaviest Mac. The spare bay in the M1 layout (about 27 mm) is wide enough for something thin, such as a USB hub or a slim SSD enclosure.
+
+### Putting Macs in and taking them out
+
+A separator can't slide past the Mac it holds, so you put Macs in from left to right:
+
+1. Drop the slot-1 separator in.
+2. Slide the Studio in about 1 cm to the right of its bay, then push it left so it tucks behind the doorstops.
+3. Drop in the separator on the Studio's right.
+4. Repeat for each mini.
+
+To take Macs out, work from the right:
+
+1. Lift out the separator on a Mac's right.
+2. Slide the Mac about 1 cm right so it clears the doorstops on its left.
+3. Pull the Mac out the front.
+
+An M4 separator is easier, because its rear doorstop sits high: lift it about 85 mm, clear of the 127 mm-tall M4, and pull it out the front.
+
+If you'd rather take any Mac out without touching the others, set `doorstop_rear = false` and re-export the separators. You then get front doorstops only. To remove a Mac, lift its left separator 10 mm, pull the separator out, then pull the Mac out. The 4 mm ramp at the back of the floor still stops a Mac from sliding off the back.
 
 ## Build A: one piece (256 mm printer)
 
@@ -55,7 +89,8 @@ The spare bay in the M1 layout (about 31 mm) is wide enough for something thin, 
 | File | Qty | Size (mm) |
 |---|---|---|
 | [`stl/frame_onepiece.stl`](stl/frame_onepiece.stl) | 1 | 254 × 221.5 × 206.5 |
-| [`stl/separator.stl`](stl/separator.stl) | 3 | 198 × 95 × 3 |
+| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl) | 4 for 2× M1 | 204 × 100 × 10 |
+| [`stl/separator_m4.stl`](stl/separator_m4.stl) | 2 for 2× M4 (later) | 204 × 100 × 10 |
 
 The frame STL is already in print orientation: **face-down**, with the rack ears and the front edges on the bed. Printed this way:
 
@@ -68,15 +103,14 @@ It needs no supports.
 
 The frame is 254 mm wide, which leaves about 1 mm on each side of a 256 mm plate. Center it, and don't add an outer brim. The part touches the bed only along a thin rectangular outline, so make sure the plate is clean. If you want more grip, use an inner-only brim or a little glue stick.
 
-**Suggested settings:** PETG or ASA, 0.2 mm layers, 4 walls, 15–20% gyroid infill. PLA can soften over time next to a warm Mac Studio. The frame takes about 0.5 kg of filament. The separators print flat with 3 walls.
+**Suggested settings:** PETG or ASA, 0.2 mm layers, 4 walls, 15–20% gyroid infill. PLA can soften over time next to a warm Mac Studio. The frame takes about 0.5 kg of filament. The separators print flat on their left face with the doorstops pointing up. They use 3 walls and need no supports.
 
 **Hardware:** only 4–6 rack screws, plus cage nuts if your rails need them. The ear slots are 6.6 × 10 mm, which fits M6, M5 and 10-32 screws and rail hole spacings from 235 to 237 mm.
 
 **Setup:**
 
-1. Put the separators in the slots for your layout (see the table above).
-2. Mount the frame in the rack with at least 2–3 screws per ear, including the top and bottom positions.
-3. Slide the Studio in on its side, with its underside facing the left frame. Then slide in the minis. Lift each one slightly to clear the 4 mm lip on the front edge. There is 6.4 mm of headroom under the top bar.
+1. Mount the frame in the rack with at least 2–3 screws per ear, including the top and bottom positions.
+2. Load the separators and Macs left to right, as described under "Putting Macs in and taking them out". The Studio goes on its side with its underside facing left. Lift each Mac slightly to clear the 4 mm lip on the front edge. There is 6.4 mm of headroom under the top bar.
 
 ## Build B: bolt-together (235 mm bed)
 
@@ -86,7 +120,7 @@ The frame is 254 mm wide, which leaves about 1 mm on each side of a 256 mm plate
 | [`stl/bolted/side_frame_right.stl`](stl/bolted/side_frame_right.stl) | 1 | 221 × 207 × 22 | Same as the left frame, mirrored. |
 | [`stl/bolted/floor.stl`](stl/bolted/floor.stl) | 1 | 211 × 207 × 14 | Prints top face up. |
 | [`stl/bolted/top_bar.stl`](stl/bolted/top_bar.stl) | 1 | 211 × 12 × 8 | Ties the frames together at the top front. |
-| [`stl/separator.stl`](stl/separator.stl) | 3 | 198 × 95 × 3 | Prints flat. |
+| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl), [`stl/separator_m4.stl`](stl/separator_m4.stl) | per layout | 204 × 100 × 10 | Same separators as the one-piece build. |
 
 ![Bolt-together parts](images/exploded.png)
 
@@ -129,7 +163,7 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 
 | Parameter | Default | What it does |
 |---|---|---|
-| `part` | `assembly` | What to render: `assembly`, `frame_onepiece`, `separator`, or a bolted part |
+| `part` | `assembly` | What to render: `assembly`, `frame_onepiece`, `separator_studio_m1`, `separator_m4`, or a bolted part |
 | `build` | `onepiece` | Frame used in the assembly preview: `onepiece` or `bolted` |
 | `config` | `m1` | Preset used in the assembly preview: `m1`, `m4`, `m1_m4`, `m4_m1` |
 | `rack_opening` | 222.25 | Clear width between your rack's rails |
@@ -137,6 +171,8 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 | `slot_w` / `tab_clear` | 3.4 / 0.3 | Separator fit. Raise `slot_w` if the tabs are too tight on your printer. |
 | `floor_vents` | `true` | Diamond vents in the floor between the slot rows |
 | `vent_spine` | 10 | Width of the solid band across the middle of the vents (0 removes it) |
+| `doorstop_rear` | `true` | Set to `false` for front doorstops only, so any Mac slides out on its own |
+| `doorstop_reach` | 7 | How far each doorstop hooks across a Mac's front or back edge |
 | `studio_play` | 1.4 | Side-to-side play in the Studio bay. This also sets where slot 1 sits. |
 | `vent_pitch` / `vent_strut` | 22 / 5 | Vent size and rib width |
 | `sep_h` | 90 | Separator height above the floor |
