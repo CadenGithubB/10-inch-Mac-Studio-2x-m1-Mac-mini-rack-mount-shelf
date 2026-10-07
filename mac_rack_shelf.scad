@@ -24,6 +24,8 @@
 //  Z = up (0 = bottom of the frame).
 //
 //  Render one part:   openscad -D 'part="frame_onepiece"' -o frame.stl mac_rack_shelf.scad
+//  The floor can take an optional 120 mm fan underneath (fan_mount).
+//
 //  Parts: assembly | frame_onepiece | separator_studio_m1 | separator_m4 | separator_end
 //         side_frame_left | side_frame_right | floor | top_bar   (bolted build)
 // =====================================================================
@@ -35,6 +37,7 @@ build  = "onepiece";  // [onepiece, bolted]
 // Preset separator layout used by the assembly preview
 config = "m1";        // [m1, m4, m1_m4, m4_m1, studio_only]
 show_devices = true;
+show_fan     = true;   // draw the optional bottom fan in the preview
 explode = 0;          // [0:5:60] pulls the bolted parts apart
 
 /* [Rack] */
@@ -110,6 +113,19 @@ doorstop_rear  = true;       // false: front doorstops only, so any Mac slides o
 dev_front      = -1;         // front face of the Macs (back of the floor's front lip)
 dev_play_y     = 1;          // front-to-back play between the doorstops
 
+/* [Bottom fan] */
+// Optional 120 mm fan screwed under the floor, blowing up through the vents.
+// M4 countersunk bolts go down through the floor and the fan's corner holes,
+// with nuts underneath; the heads sit flush with the floor.
+fan_mount      = true;
+fan_size       = 120;
+fan_thick      = 25;     // preview only; a 25 mm fan fits in the 1U below the cradle
+fan_hole_pitch = 105;    // standard 120 mm fan screw spacing
+fan_hole_d     = 4.5;    // M4 clearance (fan corner holes are about 4.3-4.5 mm)
+fan_csk_d      = 8.6;    // M4 countersunk head
+fan_offset_x   = 25;     // fan centre, right of the Studio's right-hand separator
+studio_intake  = "right"; // [right, left] which way the Studio's underside (its air intake) faces
+
 /* [Top bar] */
 bar_h       = 8;
 bar_d       = 12;
@@ -146,6 +162,8 @@ bar_bolt_z = panel_h - bar_h / 2;
 // right side plate. The floor under the Studio has no slots.
 slot_x1 = -xi + slot_w / 2 + slot_wall;
 slot_x0 = slot_x1 + sep_t + studio_dim[2] + studio_play;
+fan_c   = [slot_x0 + fan_offset_x, (slot_rows[0][1] + slot_rows[1][0]) / 2];
+fan_holes = [for (sx = [-1, 1], sy = [-1, 1]) fan_c + [sx, sy] * fan_hole_pitch / 2];
 
 function bay_w(kind) = kind == "m4" ? m4_dim[2] + m4_play : m1_dim[2] + m1_play;
 // a separator after the last mini has no doorstops, so it only needs to clear the side plate
@@ -307,9 +325,22 @@ module vent_field(y_lo, y_hi) {
     for (i = [-nx : nx], j = [0 : m]) if ((i + j + 2 * nx) % 2 == 0) {
         cx = i * step;
         cy = y0 + j * step;
-        if (abs(cx) + h <= x_lim)
+        // keep solid floor around the fan screws
+        clear = !fan_mount || min([for (p = fan_holes) abs(p[0] - cx) + abs(p[1] - cy)])
+                              > h + (fan_csk_d / 2 + 1.5) * sqrt(2);
+        if (abs(cx) + h <= x_lim && clear)
             translate([cx, cy, -1]) linear_extrude(floor_t + 2)
                 offset(r = 1.5) offset(delta = -1.5) rotate(45) square(h * sqrt(2), center = true);
+    }
+}
+
+// 120 mm fan screw holes, countersunk from the top so the heads sit flush
+module fan_screw_holes() {
+    csk_h = (fan_csk_d - fan_hole_d) / 2;
+    for (p = fan_holes) translate([p[0], p[1], 0]) {
+        translate([0, 0, -1]) cylinder(d = fan_hole_d, h = floor_t + 2);
+        translate([0, 0, floor_t - csk_h]) cylinder(d1 = fan_hole_d, d2 = fan_csk_d, h = csk_h + eps);
+        translate([0, 0, floor_t - eps]) cylinder(d = fan_csk_d, h = 1);
     }
 }
 
@@ -330,6 +361,7 @@ module floor_part(bolts = true, ramp = false, ov = 0) {
             translate([x - slot_w / 2, r[0], -1])
                 cube([slot_w, r[1] - r[0], floor_t + 2]);
         if (floor_vents) floor_vent_holes();
+        if (fan_mount) fan_screw_holes();
         // side bolts + nut traps
         if (bolts) for (s = [-1, 1], y = floor_bolt_y) {
             translate([s * xi, y, floor_bolt_z]) mirror([s > 0 ? 1 : 0, 0, 0]) bolt_hole(nut_inset + 6);
@@ -464,9 +496,30 @@ module device_on_edge(dim, foot_d, foot_h, x_left) {
 }
 
 module studio_dummy(x_left) {
-    color("#c9ccd1", 0.95) device_on_edge(studio_dim, 180, 6, x_left);
-    // front ports hint
-    color("#222") for (i = [0:1]) translate([x_left + 30, sep_y0 - 0.2, floor_t + 150 - i * 14]) cube([8, 0.4, 3]);
+    // underside (intake) facing right = mirrored within its own bay
+    translate([studio_intake == "right" ? 2 * x_left + studio_dim[2] : 0, 0, 0])
+    mirror([studio_intake == "right" ? 1 : 0, 0, 0]) {
+        color("#c9ccd1", 0.95) device_on_edge(studio_dim, 180, 6, x_left);
+        // front ports hint
+        color("#222") for (i = [0:1]) translate([x_left + 30, sep_y0 - 0.2, floor_t + 150 - i * 14]) cube([8, 0.4, 3]);
+    }
+}
+
+// 120 mm fan under the floor (preview only)
+module fan_dummy() {
+    r = 4;
+    translate([fan_c[0], fan_c[1], -fan_thick]) {
+        color("#2a2d31") difference() {
+            translate([-fan_size / 2, -fan_size / 2, 0]) hull()
+                for (x = [r, fan_size - r], y = [r, fan_size - r]) translate([x, y, 0]) cylinder(r = r, h = fan_thick);
+            translate([0, 0, -1]) cylinder(d = fan_size - 4, h = fan_thick + 2, $fn = 96);
+            for (p = fan_holes) translate([p[0] - fan_c[0], p[1] - fan_c[1], -1]) cylinder(d = fan_hole_d, h = fan_thick + 2);
+        }
+        color("#3a3e43") {
+            cylinder(d = 40, h = fan_thick - 2, $fn = 64);
+            for (a = [0 : 360 / 7 : 359]) rotate(a) translate([18, -1, 4]) rotate([18, 0, 0]) cube([38, 2, 16]);
+        }
+    }
 }
 
 module mini_dummy(kind, x_left) {
@@ -496,6 +549,7 @@ module assembly() {
     }
     color(c_sep) for (k = [0 : len(seps) - 1])
         translate([seps[k], 0, e / 2]) separator(sep_hold(config, k));
+    if (fan_mount && show_fan) translate([0, 0, -e]) fan_dummy();
     if (show_devices) translate([0, -2 * e, 0]) {
         studio_dummy((seps[0] + seps[1] - studio_dim[2]) / 2);
         if (len(devs) > 0) for (i = [0 : len(devs) - 1]) {

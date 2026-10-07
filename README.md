@@ -29,7 +29,7 @@ On its side the Studio is 95 mm wide. That leaves about 110 mm next to it, which
 
 The tallest device is 197 mm, so the cradle is 5U (222.25 mm).
 
-The Studio's air intake is on its underside, so that face goes to the left. It faces the open slot-1 separator and the diamond cutouts in the left side frame. Exhaust from all three Macs goes out the back, which is open.
+The Studio's air intake is on its underside, so that face points **right**, toward the minis. Its foot holds the underside about 6 mm off the slot-2 separator. That leaves a gap down to the floor, right above the optional bottom fan (see below). Exhaust from all three Macs goes out the back, which is open. If you'd rather face the intake toward the open left side frame, set `studio_intake = "left"`. The bay is the same either way.
 
 The floor between the two slot rows is a field of diamond vents, so air can rise into the bays from below. A solid band runs side to side across the middle of the vents. It stiffens the floor where it would otherwise sag most. The vents only help if the rack space under the cradle is open (an empty or vented U), not blocked by another device.
 
@@ -50,7 +50,7 @@ The slots go all the way through the 10 mm floor. Each separator drops 9.5 mm in
 
 Every Mac has a separator on its left. Each separator has two **doorstops** on its right-hand side. They hook around the front and back edges of the Mac to their right, so that Mac can't slide out the front or back of the rack. They don't wrap all the way around.
 
-- **Front doorstops** reach **14 mm** across the Mac's front. They cover only the edge closest to the separator, between 6 and 60 mm above the floor. The M4's front ports are in the middle of its 50 mm face, so they stay clear. I estimate the Studio's front ports sit about 20 mm or more in from its underside. I couldn't measure exact port positions, so hold a ruler against your Studio before printing.
+- **Front doorstops** reach **14 mm** across the Mac's front. They cover only the edge closest to the separator, between 6 and 60 mm above the floor. The M4's front ports are in the middle of its 50 mm face, so they stay clear. With the Studio's underside facing right, its front ports end up on the right side of the face, away from its doorstop on the left. I couldn't measure exact port positions, so check against your Macs before printing.
 - **Rear doorstops** reach 14 mm on the M4 separator. On the Studio/M1 separator they stay at **7 mm**, because the M1's rear ports run down the middle of its 36 mm back and an Ethernet or HDMI plug starts about 10 mm in. Change `rear_reach_studio_m1` if your plugs allow more.
 
 The rear doorstop has to sit right behind the Mac it holds, and the separator after the last mini holds nothing. That gives three separator versions:
@@ -91,6 +91,19 @@ An M4 separator is easier, because its rear doorstop sits high: lift it about 85
 
 If you'd rather take any Mac out without touching the others, set `doorstop_rear = false` and re-export the separators. You then get front doorstops only. To remove a Mac, lift its left separator 10 mm, pull the separator out, then pull the Mac out. The 4 mm ramp at the back of the floor still stops a Mac from sliding off the back.
 
+## Bottom fan (optional)
+
+![The cradle from below with a 120 mm fan](images/bottom_fan.png)
+
+The floor has four countersunk holes for a standard **120 mm fan** (105 mm screw spacing). The fan mounts underneath and blows up through the floor vents. It's centred 25 mm right of the Studio's right-hand separator, so it sits mostly under the minis. The Studio's intake gap lies over the fan's blades rather than its dead center hub.
+
+- **Hardware:** 4× M4 × 40 countersunk screws and 4× M4 nuts (nylon-insert nuts won't vibrate loose). They go down through the floor and the fan's corner holes. The heads sit flush with the floor. For a 15 mm slim fan, use M4 × 30. A standard 120 mm finger guard can go under the fan on the same screws.
+- **Rack space:** the fan hangs 25 mm below the cradle, inside the 1U under it. Leave that U empty so the fan can pull air in.
+- **Power:** a 5 V USB fan (for example a 5 V Noctua 120 mm) can run off a spare USB port on one of the Macs. A 12 V fan needs its own supply.
+- **Where the air goes:** the Macs sit right on the floor, so they cover most of the vents under them. The air comes up through the gaps between them: the Studio's intake gap, the separator windows, and the space between the minis. Open floor where no Mac sits, such as the spare bay or behind the shorter M4s, is an easy escape route. If you want to push more air into the Macs, cover those vents with tape.
+
+Set `fan_mount = false` to leave the holes out.
+
 ## Build A: one piece (256 mm printer)
 
 ![One-piece frame in print orientation](images/onepiece_print.png)
@@ -115,12 +128,12 @@ The frame is 254 mm wide, which leaves about 1 mm on each side of a 256 mm plate
 
 **Suggested settings:** PETG or ASA, 0.2 mm layers, 4 walls, 15–20% gyroid infill. PLA can soften over time next to a warm Mac Studio. The frame takes about 0.5 kg of filament. The separators print flat on their left face with the doorstops pointing up. They use 3 walls and need no supports.
 
-**Hardware:** only 4–6 rack screws, plus cage nuts if your rails need them. The ear slots are 6.6 × 10 mm, which fits M6, M5 and 10-32 screws and rail hole spacings from 235 to 237 mm.
+**Hardware:** only 4–6 rack screws, plus cage nuts if your rails need them. The ear slots are 6.6 × 10 mm, which fits M6, M5 and 10-32 screws and rail hole spacings from 235 to 237 mm. The optional bottom fan needs 4 M4 × 40 countersunk screws and nuts.
 
 **Setup:**
 
 1. Mount the frame in the rack with at least 2–3 screws per ear, including the top and bottom positions.
-2. Load the separators and Macs left to right, as described under "Putting Macs in and taking them out". The Studio goes on its side with its underside facing left. Lift each Mac slightly to clear the 4 mm lip on the front edge. There is 6.4 mm of headroom under the top bar.
+2. Load the separators and Macs left to right, as described under "Putting Macs in and taking them out". The Studio goes on its side with its underside facing right, toward the minis. Lift each Mac slightly to clear the 4 mm lip on the front edge. There is 6.4 mm of headroom under the top bar.
 
 ## Build B: bolt-together (235 mm bed)
 
@@ -149,6 +162,7 @@ All parts are in print orientation and need no supports. The largest part is 222
 - 10× M3 × 16 countersunk screws (DIN 7991 / ISO 10642)
 - 10× M3 hex nuts
 - 4–6 rack screws
+- Optional bottom fan: 4× M4 × 40 countersunk screws and 4× M4 nuts
 
 **Assembly:**
 
@@ -184,6 +198,9 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 | `slot_mode` | `presets` | `presets`: the 6 slots the layouts use. `grid`: a slot every 5 mm (thinner walls). |
 | `doorstop_rear` | `true` | Set to `false` for front doorstops only, so any Mac slides out on its own |
 | `doorstop_reach` | 14 | How far the front doorstops (and the M4 rear one) hook across a Mac |
+| `fan_mount` | `true` | Screw holes for a 120 mm fan under the floor |
+| `fan_offset_x` | 25 | Fan centre, in mm right of the Studio's right-hand separator |
+| `studio_intake` | `right` | Which way the Studio's underside (air intake) faces |
 | `rear_reach_studio_m1` | 7 | How far the Studio/M1 rear doorstop hooks across the back. It's kept short to clear the M1's rear plugs. |
 | `studio_play` | 1.4 | Side-to-side play in the Studio bay. This also sets where slot 1 sits. |
 | `vent_pitch` / `vent_strut` | 22 / 5 | Vent size and rib width |

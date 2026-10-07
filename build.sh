@@ -35,4 +35,5 @@ img front_m1_m4     0,0,0,90,0,0,0     -D 'config="m1_m4"' --projection=o
 img exploded        0,0,0,62,0,28,0    -D 'config="m1"' -D 'show_devices=false' -D 'build="bolted"' -D 'explode=45'
 img separators_m4   0,0,0,60,0,35,0    -D 'config="m4"' -D 'show_devices=false'
 img onepiece_print  0,0,0,55,0,25,0    -D 'part="frame_onepiece"'
+img bottom_fan      0,0,0,125,0,30,0   -D 'config="m1"'
 img floor_slots     0,0,0,0,0,0,0      -D 'part="floor"' --projection=o
