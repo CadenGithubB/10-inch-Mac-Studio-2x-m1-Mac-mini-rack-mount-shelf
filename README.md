@@ -31,9 +31,11 @@ The tallest device is 197 mm, so the cradle is 5U (222.25 mm).
 
 The Studio's air intake is on its underside, so that face goes against the open left side frame. Exhaust from all three Macs goes out the back, which is open.
 
+The floor between the two slot rows is a field of diamond vents, so air can rise into the bays from below. The vents only help if the rack space under the cradle is open (an empty or vented U), not blocked by another device.
+
 ## Separator slots
 
-The floor has 42 slots at a 5 mm pitch. They are numbered 1–42 from the left, and the numbers are engraved along the front edge of the floor. Each separator has two tabs that drop into one slot position.
+The floor has 42 slots at a 5 mm pitch. They are numbered 1–42 from the left, and the numbers are engraved along the front edge of the floor. The slots go all the way through the 10 mm floor. Each separator has two tabs that drop 9.5 mm into one slot position.
 
 | Layout | Separators in slots | Bays (left → right) |
 |---|---|---|
@@ -59,7 +61,8 @@ The frame STL is already in print orientation: **face-down**, with the rack ears
 
 - The top bar sits on the plate instead of bridging 210 mm in mid-air.
 - The side-frame cutouts are 45° diamonds, and the rear stop is a 45° ramp.
-- The widest bridge is 3.4 mm, at the separator slot ceilings.
+- The floor vents are 45° diamonds as well.
+- The widest bridge is 3.4 mm, at the tops of the separator slots.
 
 It needs no supports.
 
@@ -132,6 +135,8 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 | `rack_opening` | 222.25 | Clear width between your rack's rails |
 | `rail_hole_pitch` | 236.5 | Centre-to-centre of the rail holes |
 | `slot_w` / `tab_clear` | 3.4 / 0.3 | Separator fit. Raise `slot_w` if the tabs are too tight on your printer. |
+| `floor_vents` | `true` | Diamond vents in the floor between the slot rows |
+| `vent_pitch` / `vent_strut` | 22 / 5 | Vent size and rib width |
 | `sep_h` | 90 | Separator height above the floor |
 | `studio_dim`, `m1_dim`, `m4_dim` | Apple specs | Device sizes used for the preview |
 

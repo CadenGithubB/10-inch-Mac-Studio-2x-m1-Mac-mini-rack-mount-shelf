@@ -72,14 +72,20 @@ rear_lip_t  = 3.5;  // bolted floor only; the one-piece floor uses a 45 deg ramp
 /* [Separator slots] */
 slot_pitch  = 5;
 slot_w      = 3.4;
-slot_depth  = 5;
-slot_rows   = [[8, 38], [155, 185]];   // Y ranges of the two slot rows
+slot_rows   = [[8, 38], [155, 185]];   // Y ranges of the two slot rows (cut through the floor)
+
+/* [Floor vents] */
+floor_vents      = true;
+vent_pitch       = 22;   // diamond centre spacing
+vent_strut       = 5;    // rib width between diamonds (45 deg, prints without supports)
+vent_side_margin = 16;   // solid floor kept along each side plate
+vent_row_margin  = 6;    // solid floor kept next to each slot row
 
 /* [Separators] */
 sep_t       = 3;
 sep_h       = 90;    // height above the floor
 tab_clear   = 0.3;   // per end, along Y
-tab_depth   = 4.7;
+tab_depth   = 9.5;   // tabs reach 0.5 mm short of the floor's underside
 
 /* [Top bar] */
 bar_h       = 8;
@@ -228,6 +234,27 @@ module nut_slot_from_top(z_axis, z_top) {
 // bolts: side bolt holes + nut traps (bolted build)
 // ramp:  45 deg rear stop instead of a square lip (one piece, printed face-down)
 // ov:    extra width on each side so the floor fuses into the side plates
+// Diamond vents between the two slot rows. Whole diamonds only, with 45 deg
+// edges, so they print without supports flat (bolted floor) or standing
+// up (one-piece frame printed face-down).
+module floor_vent_holes() {
+    h     = vent_pitch / 2 - vent_strut / sqrt(2);   // half-diagonal
+    x_lim = xi - vent_side_margin;
+    y_lo  = slot_rows[0][1] + vent_row_margin;
+    y_hi  = slot_rows[1][0] - vent_row_margin;
+    step  = vent_pitch / 2;
+    m     = floor((y_hi - y_lo - 2 * h) / step);
+    y0    = (y_lo + y_hi) / 2 - m * step / 2;
+    nx    = ceil(x_lim / step);
+    for (i = [-nx : nx], j = [0 : m]) if ((i + j + 2 * nx) % 2 == 0) {
+        cx = i * step;
+        cy = y0 + j * step;
+        if (abs(cx) + h <= x_lim)
+            translate([cx, cy, -1]) linear_extrude(floor_t + 2)
+                offset(r = 1.5) offset(delta = -1.5) rotate(45) square(h * sqrt(2), center = true);
+    }
+}
+
 module floor_part(bolts = true, ramp = false, ov = 0) {
     w = inner_w + 2 * ov;
     difference() {
@@ -240,10 +267,11 @@ module floor_part(bolts = true, ramp = false, ov = 0) {
             else
                 translate([-xi - ov, y_back - rear_lip_t, floor_t - eps]) cube([w, rear_lip_t, rear_lip_h + eps]);
         }
-        // separator slots
+        // separator slots, cut all the way through the floor
         for (n = [1 : slot_count], r = slot_rows)
-            translate([slot_x(n) - slot_w / 2, r[0], floor_t - slot_depth])
-                cube([slot_w, r[1] - r[0], slot_depth + 1]);
+            translate([slot_x(n) - slot_w / 2, r[0], -1])
+                cube([slot_w, r[1] - r[0], floor_t + 2]);
+        if (floor_vents) floor_vent_holes();
         // slot numbers, read from the front like a ruler
         for (n = [1 : slot_count])
             translate([slot_x(n), y_front + lip_t + 0.8, floor_t - 0.6])
