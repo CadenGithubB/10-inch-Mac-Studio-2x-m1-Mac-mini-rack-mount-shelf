@@ -111,7 +111,7 @@ doorstop_z     = [16, 70];   // height of the front doorstop and the Studio/M1 r
 m4_rear_z      = [56, 94];   // the M4 rear doorstop sits high so the separator lifts out over an M4
 doorstop_rear  = true;       // false: front doorstops only, so any Mac slides out on its own
 dev_front      = -1;         // front face of the Macs (back of the floor's front lip)
-dev_play_y     = 1;          // front-to-back play between the doorstops
+dev_play_y     = 2.5;        // front-to-back play between the doorstops (leaves room for ABS shrinking ~0.5%)
 
 /* [Bottom fan] */
 // Optional 120 mm fan screwed under the floor, blowing up through the vents.

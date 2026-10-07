@@ -68,7 +68,7 @@ The rear doorstop has to sit right behind the Mac it holds, and the separator af
 | Studio + M1 + M4 | **1, 2** Studio/M1, **3** M4, **6** end | Studio 96.4 · M1 37 · M4 52 · spare 12 mm |
 | Studio + M4 + M1 | **1** Studio/M1, **2** M4, **4** Studio/M1, **6** end | Studio 96.4 · M4 52 · M1 37 · spare 12 mm |
 
-Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. Front-to-back play between the doorstops is 1 mm. For your M1 setup, print three Studio/M1 separators and one end separator. When you move to M4 minis, print two M4 separators.
+Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. Front-to-back play between the doorstops is 2.5 mm, which leaves room for ABS shrinking as it cools. For your M1 setup, print three Studio/M1 separators and one end separator. When you move to M4 minis, print two M4 separators.
 
 The floor under the Studio has no slots, so it stays solid under the heaviest Mac. The spare bay in the M1 layout (about 27 mm) is wide enough for something thin, such as a USB hub or a slim SSD enclosure.
 
@@ -111,8 +111,8 @@ Set `fan_mount = false` to leave the holes out.
 | File | Qty | Size (mm) |
 |---|---|---|
 | [`stl/frame_onepiece.stl`](stl/frame_onepiece.stl) | 1 | 254 × 221.5 × 206.5 |
-| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl) | 3 for 2× M1 | 204 × 100 × 17 |
-| [`stl/separator_m4.stl`](stl/separator_m4.stl) | 2 for 2× M4 (later) | 204 × 100 × 17 |
+| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl) | 3 for 2× M1 | 206 × 100 × 17 |
+| [`stl/separator_m4.stl`](stl/separator_m4.stl) | 2 for 2× M4 (later) | 201 × 100 × 17 |
 | [`stl/separator_end.stl`](stl/separator_end.stl) | 1 for 2× M1 | 198 × 100 × 3 |
 
 The frame STL is already in print orientation: **face-down**, with the rack ears and the front edges on the bed. Printed this way:
@@ -126,7 +126,18 @@ It needs no supports.
 
 The frame is 254 mm wide, which leaves about 1 mm on each side of a 256 mm plate. Center it, and don't add an outer brim. The part touches the bed only along a thin rectangular outline, so make sure the plate is clean. If you want more grip, use an inner-only brim or a little glue stick.
 
-**Suggested settings:** PETG or ASA, 0.2 mm layers, 4 walls, 15–20% gyroid infill. PLA can soften over time next to a warm Mac Studio. The frame takes about 0.5 kg of filament. The separators print flat on their left face with the doorstops pointing up. They use 3 walls and need no supports.
+**Suggested settings:** 0.2 mm layers, 4 walls, 5 top/bottom layers, 15–20% gyroid infill. The frame is mostly thin walls, so walls add strength more than infill does. If you want more, go to 5–6 walls rather than 100% infill. The frame takes about 0.5 kg of filament. The separators print flat on their left face with the doorstops pointing up. They use 3 walls and need no supports.
+
+**Material:** ABS, ASA or PETG. ABS and ASA hold their shape to about 95°C, compared with about 70°C for PETG. PLA can soften over time next to a warm Mac Studio.
+
+**Printing in ABS or ASA:**
+
+- Use an enclosed printer, such as an X1C or P1S, not an open A1. Let the chamber warm up for 10–15 minutes before starting, and keep the door closed.
+- Set the bed to 100–110°C. Turn the part-cooling fan off for the first layers and keep it low (0–20%) after that.
+- Stay at 15–20% infill. Solid ABS shrinks harder as it cools and is more likely to warp.
+- The frame touches the bed along a thin outline, and its outer corners are the most likely to lift. Glue stick helps. There's no room for an outer brim on the left and right edges of a 256 mm plate, but an inner brim works. Give the separators a 3–5 mm brim.
+- If the big frame keeps warping, the bolt-together version (Build B) prints as smaller, flatter parts that are much easier in ABS.
+- Print somewhere ventilated, because ABS gives off fumes.
 
 **Hardware:** only 4–6 rack screws, plus cage nuts if your rails need them. The ear slots are 6.6 × 10 mm, which fits M6, M5 and 10-32 screws and rail hole spacings from 235 to 237 mm. The optional bottom fan needs 4 M4 × 40 countersunk screws and nuts.
 
@@ -143,7 +154,7 @@ The frame is 254 mm wide, which leaves about 1 mm on each side of a 256 mm plate
 | [`stl/bolted/side_frame_right.stl`](stl/bolted/side_frame_right.stl) | 1 | 221 × 207 × 22 | Same as the left frame, mirrored. |
 | [`stl/bolted/floor.stl`](stl/bolted/floor.stl) | 1 | 211 × 207 × 14 | Prints top face up. |
 | [`stl/bolted/top_bar.stl`](stl/bolted/top_bar.stl) | 1 | 211 × 12 × 8 | Ties the frames together at the top front. |
-| `stl/separator_*.stl` | per layout | 204 × 100 × 17 | Same separators as the one-piece build. |
+| `stl/separator_*.stl` | per layout | up to 206 × 100 × 17 | Same separators as the one-piece build. |
 
 ![Bolt-together parts](images/exploded.png)
 
