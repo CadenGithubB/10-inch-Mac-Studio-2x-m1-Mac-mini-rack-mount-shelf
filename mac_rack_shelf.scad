@@ -24,12 +24,12 @@
 //  Z = up (0 = bottom of the frame).
 //
 //  Render one part:   openscad -D 'part="frame_onepiece"' -o frame.stl mac_rack_shelf.scad
-//  Parts: assembly | frame_onepiece | separator_studio_m1 | separator_m4
+//  Parts: assembly | frame_onepiece | separator_studio_m1 | separator_m4 | separator_end
 //         side_frame_left | side_frame_right | floor | top_bar   (bolted build)
 // =====================================================================
 
 /* [View] */
-part   = "assembly";  // [assembly, frame_onepiece, separator_studio_m1, separator_m4, side_frame_left, side_frame_right, floor, top_bar]
+part   = "assembly";  // [assembly, frame_onepiece, separator_studio_m1, separator_m4, separator_end, side_frame_left, side_frame_right, floor, top_bar]
 // Frame shown in the assembly preview
 build  = "onepiece";  // [onepiece, bolted]
 // Preset separator layout used by the assembly preview
@@ -99,8 +99,10 @@ tab_depth   = 9.5;   // tabs reach 0.5 mm short of the floor's underside
 
 /* [Doorstops] */
 // Each separator holds the Mac on its right: a doorstop in front of it and
-// one behind it. They print flat with the separator, pointing up.
-doorstop_reach = 7;          // how far a doorstop reaches across the Mac's front/back
+// one behind it. They print flat with the separator, pointing up. The
+// separator after the last mini holds nothing and has no doorstops.
+doorstop_reach = 14;         // how far the front doorstops (and the M4 rear one) reach across the Mac
+rear_reach_studio_m1 = 7;    // Studio/M1 rear doorstop: kept short to clear the M1's rear plugs
 doorstop_t     = 3;          // doorstop thickness, front to back
 doorstop_z     = [16, 70];   // height of the front doorstop and the Studio/M1 rear one
 m4_rear_z      = [56, 94];   // the M4 rear doorstop sits high so the separator lifts out over an M4
@@ -146,7 +148,8 @@ slot_x1 = -xi + slot_w / 2 + slot_wall;
 slot_x0 = slot_x1 + sep_t + studio_dim[2] + studio_play;
 
 function bay_w(kind) = kind == "m4" ? m4_dim[2] + m4_play : m1_dim[2] + m1_play;
-function slot_fits(x) = x + sep_t / 2 + doorstop_reach + 0.5 <= xi;
+// a separator after the last mini has no doorstops, so it only needs to clear the side plate
+function slot_fits(x) = x + sep_t / 2 + 0.5 <= xi;
 // Separator positions from the Studio's right-hand separator onward, for a
 // list of minis left to right. The last one is left out when the final
 // mini simply sits against the side plate.
@@ -181,10 +184,10 @@ function preset_devices(c) =
 function preset_xs(c) = concat([slot_x1], mini_xs(preset_devices(c)));
 
 function dev_depth(kind) = kind == "m4" ? m4_dim[1] : kind == "m1" ? m1_dim[1] : studio_dim[1];
-// Depth of the Mac held by separator k of a preset (the Mac on its right).
-// A separator with nothing on its right gets the long doorstops.
+// Depth of the Mac held by separator k of a preset (the Mac on its right),
+// or 0 for an end separator with nothing on its right.
 function sep_hold(c, k) = let(d = preset_devices(c))
-    k == 0 ? studio_dim[1] : (k - 1 < len(d) ? dev_depth(d[k - 1]) : studio_dim[1]);
+    k == 0 ? studio_dim[1] : (k - 1 < len(d) ? dev_depth(d[k - 1]) : 0);
 
 // ---------------------------------------------------------------------
 // Helpers
@@ -378,6 +381,7 @@ sep_y1 = y_back - max(rear_lip_t, rear_lip_h) - 0.5;
 function rear_stop_y(depth) = dev_front + depth + dev_play_y;   // inner face of the rear doorstop
 function rear_is_mid(depth) = rear_stop_y(depth) + doorstop_t < sep_y1 - 12;
 function rear_z(depth) = rear_is_mid(depth) ? m4_rear_z : doorstop_z;
+function rear_reach(depth) = rear_is_mid(depth) ? doorstop_reach : rear_reach_studio_m1;
 
 module separator_body(body_h) {
     translate([sep_y0, floor_t]) hull() {
@@ -388,7 +392,7 @@ module separator_body(body_h) {
     }
 }
 
-// hold: depth of the Mac on the separator's right (197 Studio/M1, 127 M4)
+// hold: depth of the Mac on the separator's right (197 Studio/M1, 127 M4, 0 none)
 module separator_profile(hold) {   // 2D in (Y, Z)
     yr = rear_stop_y(hold);
     rz = rear_z(hold);
@@ -404,10 +408,10 @@ module separator_profile(hold) {   // 2D in (Y, Z)
                          [b - c, floor_t - tab_depth], [b, floor_t - tab_depth + c], [b, floor_t + eps]]);
             }
             // plate reaches forward to carry the front doorstop
-            translate([dev_front - doorstop_t, doorstop_z[0]])
+            if (hold > 0) translate([dev_front - doorstop_t, doorstop_z[0]])
                 square([sep_y0 + 1 - dev_front + doorstop_t, doorstop_z[1] - doorstop_z[0]]);
             // ...and back to carry a rear doorstop that sits past the plate
-            if (doorstop_rear && !rear_is_mid(hold))
+            if (hold > 0 && doorstop_rear && !rear_is_mid(hold))
                 translate([sep_y1 - 1, rz[0]]) square([yr + doorstop_t - sep_y1 + 1, rz[1] - rz[0]]);
         }
         // vent / grip windows; one strut always lands under the M4 rear doorstop
@@ -419,15 +423,14 @@ module separator_profile(hold) {   // 2D in (Y, Z)
                 translate([-100, floor_t + 12]) square([1000, 1000]);
             }
             for (y = struts) translate([y - 4, 0]) square([8, 1000]);
-            if (rear_is_mid(hold)) translate([yr + doorstop_t / 2 - 4, 0]) square([8, 1000]);
+            if (hold > 0 && rear_is_mid(hold)) translate([yr + doorstop_t / 2 - 4, 0]) square([8, 1000]);
         }
     }
 }
 
 // Doorstop on the separator's right face, covering y in [y_a, y_a + doorstop_t]
-module doorstop(y_a, z_range) {
-    c = min(3, doorstop_reach / 2);
-    r = doorstop_reach;
+module doorstop(y_a, z_range, r) {
+    c = min(3, r / 2);
     translate([sep_t / 2 - eps, y_a + doorstop_t, 0]) rotate([90, 0, 0])
         linear_extrude(doorstop_t)
             polygon([[0, z_range[0]], [r - c, z_range[0]], [r, z_range[0] + c],
@@ -436,8 +439,10 @@ module doorstop(y_a, z_range) {
 
 module separator(hold = 197) {
     rotate([90, 0, 90]) linear_extrude(sep_t, center = true) separator_profile(hold);
-    doorstop(dev_front - doorstop_t, doorstop_z);
-    if (doorstop_rear) doorstop(rear_stop_y(hold), rear_z(hold));
+    if (hold > 0) {
+        doorstop(dev_front - doorstop_t, doorstop_z, doorstop_reach);
+        if (doorstop_rear) doorstop(rear_stop_y(hold), rear_z(hold), rear_reach(hold));
+    }
 }
 
 // ---------------------------------------------------------------------
@@ -529,6 +534,7 @@ else if (part == "floor")            floor_part();
 else if (part == "top_bar")          print_top_bar();
 else if (part == "separator_studio_m1") print_separator(studio_dim[1]);
 else if (part == "separator_m4")     print_separator(m4_dim[1]);
+else if (part == "separator_end")    print_separator(0);
 
 // Echo the useful numbers when rendering
 echo(str("inner width = ", inner_w, " mm, ", slot_count, " slots at x = ", slot_xs,

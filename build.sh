@@ -12,6 +12,7 @@ echo "STL  frame_onepiece, separators"
 openscad -q -D 'part="frame_onepiece"' -o stl/frame_onepiece.stl "$SCAD" &
 openscad -q -D 'part="separator_studio_m1"' -o stl/separator_studio_m1.stl "$SCAD" &
 openscad -q -D 'part="separator_m4"' -o stl/separator_m4.stl "$SCAD" &
+openscad -q -D 'part="separator_end"' -o stl/separator_end.stl "$SCAD" &
 for p in side_frame_left side_frame_right floor top_bar; do
   echo "STL  bolted/$p"
   openscad -q -D "part=\"$p\"" -o "stl/bolted/$p.stl" "$SCAD" &

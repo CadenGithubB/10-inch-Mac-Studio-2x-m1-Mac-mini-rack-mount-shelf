@@ -48,23 +48,27 @@ The slots go all the way through the 10 mm floor. Each separator drops 9.5 mm in
 
 **Why only 6 slots:** the earlier version had a slot every 5 mm. That left walls only 1.6 mm thick between slots, held only at their ends and printed with the layer lines running across them. A firm sideways push on one separator (very roughly 4 kg) could crack one. With only the slots your layouts use, the thinnest wall is 11.6 mm. Strength grows with the square of thickness, so that's about 50× stronger, and the floor is much stiffer side to side. If you ever need other bay widths, set `slot_mode = "grid"` to get the 5 mm slots back. Treat those thin walls gently.
 
-Every Mac has a separator on its left. Each separator has two small **doorstops** on its right-hand side. They hook 7 mm around the front and back edges of the Mac to their right, so that Mac can't slide out the front or back of the rack. They don't wrap all the way around.
+Every Mac has a separator on its left. Each separator has two **doorstops** on its right-hand side. They hook around the front and back edges of the Mac to their right, so that Mac can't slide out the front or back of the rack. They don't wrap all the way around.
 
-The rear doorstop has to sit right behind the Mac it holds, so there are two separator versions:
+- **Front doorstops** reach **14 mm** across the Mac's front. They cover only the edge closest to the separator, between 6 and 60 mm above the floor. The M4's front ports are in the middle of its 50 mm face, so they stay clear. I estimate the Studio's front ports sit about 20 mm or more in from its underside. I couldn't measure exact port positions, so hold a ruler against your Studio before printing.
+- **Rear doorstops** reach 14 mm on the M4 separator. On the Studio/M1 separator they stay at **7 mm**, because the M1's rear ports run down the middle of its 36 mm back and an Ethernet or HDMI plug starts about 10 mm in. Change `rear_reach_studio_m1` if your plugs allow more.
 
-| File | Holds | Rear doorstop |
+The rear doorstop has to sit right behind the Mac it holds, and the separator after the last mini holds nothing. That gives three separator versions:
+
+| File | Holds | Doorstops |
 |---|---|---|
-| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl) | the Studio or an M1 (197 mm deep) | at the back end, 197 mm behind the front |
-| [`stl/separator_m4.stl`](stl/separator_m4.stl) | an M4 (127 mm deep) | partway back, set high |
+| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl) | the Studio or an M1 (197 mm deep) | front 14 mm; rear 7 mm at the back end |
+| [`stl/separator_m4.stl`](stl/separator_m4.stl) | an M4 (127 mm deep) | front 14 mm; rear 14 mm, partway back and set high |
+| [`stl/separator_end.stl`](stl/separator_end.stl) | nothing (it sits after the last mini) | none |
 
 | Layout | Separators in slots | Bays (left → right) |
 |---|---|---|
-| Studio + 2× M1 | **1, 2, 3, 5**, all Studio/M1 | Studio 96.4 · M1 37 · M1 37 · spare 27 mm |
+| Studio + 2× M1 | **1, 2, 3** Studio/M1, **5** end | Studio 96.4 · M1 37 · M1 37 · spare 27 mm |
 | Studio + 2× M4 | **1** Studio/M1, **2, 4** M4 | Studio 96.4 · M4 52 · M4 52 mm (against the side frame) |
-| Studio + M1 + M4 | **1, 2** Studio/M1, **3** M4, **6** Studio/M1 | Studio 96.4 · M1 37 · M4 52 · spare 12 mm |
-| Studio + M4 + M1 | **1** Studio/M1, **2** M4, **4, 6** Studio/M1 | Studio 96.4 · M4 52 · M1 37 · spare 12 mm |
+| Studio + M1 + M4 | **1, 2** Studio/M1, **3** M4, **6** end | Studio 96.4 · M1 37 · M4 52 · spare 12 mm |
+| Studio + M4 + M1 | **1** Studio/M1, **2** M4, **4** Studio/M1, **6** end | Studio 96.4 · M4 52 · M1 37 · spare 12 mm |
 
-Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. Front-to-back play between the doorstops is 1 mm. For your M1 setup, print four Studio/M1 separators. When you move to M4 minis, print two M4 separators.
+Side-to-side play is 1.4 mm for the Studio, 1 mm for an M1 and 2 mm for an M4. Front-to-back play between the doorstops is 1 mm. For your M1 setup, print three Studio/M1 separators and one end separator. When you move to M4 minis, print two M4 separators.
 
 The floor under the Studio has no slots, so it stays solid under the heaviest Mac. The spare bay in the M1 layout (about 27 mm) is wide enough for something thin, such as a USB hub or a slim SSD enclosure.
 
@@ -73,14 +77,14 @@ The floor under the Studio has no slots, so it stays solid under the heaviest Ma
 A separator can't slide past the Mac it holds, so you put Macs in from left to right:
 
 1. Drop the slot-1 separator in.
-2. Slide the Studio in about 1 cm to the right of its bay, then push it left so it tucks behind the doorstops.
+2. Slide the Studio in about 1.5 cm to the right of its bay, then push it left so it tucks behind the doorstops.
 3. Drop in the separator on the Studio's right.
 4. Repeat for each mini.
 
 To take Macs out, work from the right:
 
 1. Lift out the separator on a Mac's right.
-2. Slide the Mac about 1 cm right so it clears the doorstops on its left.
+2. Slide the Mac about 1.5 cm right so it clears the doorstops on its left.
 3. Pull the Mac out the front.
 
 An M4 separator is easier, because its rear doorstop sits high: lift it about 85 mm, clear of the 127 mm-tall M4, and pull it out the front.
@@ -94,8 +98,9 @@ If you'd rather take any Mac out without touching the others, set `doorstop_rear
 | File | Qty | Size (mm) |
 |---|---|---|
 | [`stl/frame_onepiece.stl`](stl/frame_onepiece.stl) | 1 | 254 × 221.5 × 206.5 |
-| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl) | 4 for 2× M1 | 204 × 100 × 10 |
-| [`stl/separator_m4.stl`](stl/separator_m4.stl) | 2 for 2× M4 (later) | 204 × 100 × 10 |
+| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl) | 3 for 2× M1 | 204 × 100 × 17 |
+| [`stl/separator_m4.stl`](stl/separator_m4.stl) | 2 for 2× M4 (later) | 204 × 100 × 17 |
+| [`stl/separator_end.stl`](stl/separator_end.stl) | 1 for 2× M1 | 198 × 100 × 3 |
 
 The frame STL is already in print orientation: **face-down**, with the rack ears and the front edges on the bed. Printed this way:
 
@@ -125,7 +130,7 @@ The frame is 254 mm wide, which leaves about 1 mm on each side of a 256 mm plate
 | [`stl/bolted/side_frame_right.stl`](stl/bolted/side_frame_right.stl) | 1 | 221 × 207 × 22 | Same as the left frame, mirrored. |
 | [`stl/bolted/floor.stl`](stl/bolted/floor.stl) | 1 | 211 × 207 × 14 | Prints top face up. |
 | [`stl/bolted/top_bar.stl`](stl/bolted/top_bar.stl) | 1 | 211 × 12 × 8 | Ties the frames together at the top front. |
-| [`stl/separator_studio_m1.stl`](stl/separator_studio_m1.stl), [`stl/separator_m4.stl`](stl/separator_m4.stl) | per layout | 204 × 100 × 10 | Same separators as the one-piece build. |
+| `stl/separator_*.stl` | per layout | 204 × 100 × 17 | Same separators as the one-piece build. |
 
 ![Bolt-together parts](images/exploded.png)
 
@@ -178,7 +183,8 @@ Everything is in [`mac_rack_shelf.scad`](mac_rack_shelf.scad) (OpenSCAD 2021.01 
 | `vent_spine` | 10 | Width of the solid band across the middle of the vents (0 removes it) |
 | `slot_mode` | `presets` | `presets`: the 6 slots the layouts use. `grid`: a slot every 5 mm (thinner walls). |
 | `doorstop_rear` | `true` | Set to `false` for front doorstops only, so any Mac slides out on its own |
-| `doorstop_reach` | 7 | How far each doorstop hooks across a Mac's front or back edge |
+| `doorstop_reach` | 14 | How far the front doorstops (and the M4 rear one) hook across a Mac |
+| `rear_reach_studio_m1` | 7 | How far the Studio/M1 rear doorstop hooks across the back. It's kept short to clear the M1's rear plugs. |
 | `studio_play` | 1.4 | Side-to-side play in the Studio bay. This also sets where slot 1 sits. |
 | `vent_pitch` / `vent_strut` | 22 / 5 | Vent size and rib width |
 | `sep_h` | 90 | Separator height above the floor |
